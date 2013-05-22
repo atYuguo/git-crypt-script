@@ -1,0 +1,7 @@
+*.*~
+\#*\#
+*.txt*
+*.exe
+*.dll
+sed*
+pcre-config
