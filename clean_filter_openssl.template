@@ -1,0 +1,5 @@
+:: 24 or less hex characters
+set SALT_FIXED=<your-salt>
+set PASS_FIXED=<your-passphrase>
+
+openssl enc -hex -aes-256-ecb -S %SALT_FIXED% -k %PASS_FIXED%

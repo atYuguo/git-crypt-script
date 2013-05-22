@@ -1,0 +1,5 @@
+:: No salt is needed for decryption.
+set PASS_FIXED=<your-passphrase>
+
+:: Error messages are redirect to /dev/null.
+openssl enc -d -hex -aes-256-ecb -k %PASS_FIXED% -in "%1" 2>null || cat "%1"
