@@ -42,7 +42,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 你的密码明文的保存在
 
-><pre><code>~/.git_secure/<your-reponame>/
+><pre><code>~/.git_secure/<your-reponame>/</pre></code>
 
 里的三个 `*_filter_openssl` 文件里，要注意保护这些文件。
 
