@@ -1,31 +1,27 @@
 #!/bin/bash
-if [ "$1" != "keylist" ]
-then
-    oldFilehash=$(grep -oP '(?<=^'$1'@)[0-9a-fA-F]*(?=@@)' keylist)
-    newFilehash=$(openssl dgst -sha1 $1)
-    newFilehash=$(echo $newFilehash | grep -oP '(?<=\)=\W)[0-9a-fA-F]*')
-    if [ "$oldFilehash" = "$newFilehash" ]
+PASS_FIXED=tiankaimi
+breakline=$(echo -e '\r')
+firstlineFlag=true
+while read -r aLine
+do
+    if [ "$firstlineFlag" = "true" ]
     then
-	theLine=$(grep -P '^'$1'@[0-9a-fA-F]*@@[0-9a-fA-F]*@@@[0-9a-fA-F]*' keylist)
-	eKey=$(echo $theLine | grep -oP '(?<=@@)[0-9a-fA-F]*(?=@@@)')
-	eSalt=$(echo $theLine | grep -oP '(?<=@@@)[0-9a-fA-F]*')
-#	echo yes
-#	echo $eKey
-#	echo yes
+	originContent=$aLine
+	firstlineFlag=flase
     else
-	eKey=$(openssl rand -hex 32)
-	eSalt=$(openssl rand -hex 8)
-	if [ "$oldFilehash" = "" ]
-	then
-	    echo $1@$newFilehash@@$eKey@@@$eSalt >>keylist
-	else
-    	    sed -i 's/^'"$1"'.*$/'"$1"'@'"$newFilehash"'@@'"$eKey"'@@@'"$eSalt"'/g' keylist
-	fi
+	originContent=$originContent$breakline$aLine
     fi
- 
-#    echo $eKey
-
-    openssl enc -aes-256-cbc -S $eSalt -k $eKey -in $1
+done
+newHash=$(echo $originContent | openssl dgst -sha1)
+newHash=$(echo $newHash | grep -oP '(?<=\)=\W)[0-9a-fA-F]*')
+oldHash=$(grep -oP '(?<=^)'$newHash'(?=@)' ~/.mgiteg)
+if [ "$oldHash" = "" ]
+then
+    newSalt=$(openssl rand -hex 8)
+    echo $newHash@$newSalt >> ~/.mgiteg
 else
-    openssl enc -aes-256-cbc -k 1234567890 -in $1
+    thisLine=$(grep -oP '^'$oldHash'.*$'  ~/.mgiteg)
+    newSalt=$(echo $thisLine | grep -oP '(?<=@)[0-9a-fA-F]*(?=$)')
 fi
+#echo $originContent >> ~/.tgitlog
+echo $originContent | openssl enc -aes-256-cbc -S $newSalt -k $PASS_FIXED

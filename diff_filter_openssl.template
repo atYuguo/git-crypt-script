@@ -1,5 +1,4 @@
-:: No salt is needed for decryption.
-set PASS_FIXED=<your-passphrase>
+#!/bin/bash
+PASS_FIXED=tiankaimi
+openssl enc -d -aes-256-cbc -k $PASS_FIXED -in "$1" 2>/dev/null && sed 's/\r/\n/g' || cat "$1"
 
-:: Error messages are redirect to /dev/null.
-openssl enc -d -hex -aes-256-ecb -k %PASS_FIXED% -in "%1" 2>null || cat "%1"
