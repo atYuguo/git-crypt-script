@@ -25,5 +25,7 @@ then
  
 #    echo $eKey
 
-    openssl enc -aes-256-cbc -S $eSalt -k $eKey -in $1 -out test.txt
+    openssl enc -aes-256-cbc -S $eSalt -k $eKey -in $1
+else
+    openssl enc -aes-256-cbc -k 1234567890 -in $1
 fi

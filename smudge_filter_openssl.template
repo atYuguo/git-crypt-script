@@ -1,6 +1,14 @@
-:: No salt is needed for decryption.
-set PASS_FIXED=<your-passphrase>
-
-:: If decryption fails, use `cat` instead. 
-:: Error messages are redirected to /dev/null.
-openssl enc -d -hex -aes-256-ecb -k %PASS_FIXED% 2> null || cat
+#!/bin/bash
+if [ "$1" != "keyfile" ]
+then
+    theLine=$(grep -P '^'$1'@[0-9a-fA-F]*@@[0-9a-fA-F]*@@@[0-9a-fA-F]*' keylist)
+    if [ "$theLine" = "" ]
+    then
+	cat $1
+    else
+	eKey=$(echo $theLine | grep -oP '(?<=@@)[0-9a-fA-F]*(?=@@@)')
+	openssl enc -d -aes-256-cbc -k $eKey -in $1
+    fi
+else
+    openssl enc -d -aes-256-cbc -k 1234567890 -in $1 2>/dev/null || cat $1
+fi
