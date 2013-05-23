@@ -1,5 +1,7 @@
 #!/bin/bash
-PASS_FIXED=tiankaimi
+REPONAME=<your-reponame>
+PASS_FIXED=<your-password>
+HASHSALT_PATH=~/.git_secure/$REPONAME/hashandsalt
 breakline=$(echo -e '\r')
 firstlineFlag=true
 while read -r aLine
@@ -14,13 +16,13 @@ do
 done
 newHash=$(echo $originContent | openssl dgst -sha1)
 newHash=$(echo $newHash | grep -oP '(?<=\)=\W)[0-9a-fA-F]*')
-oldHash=$(grep -oP '(?<=^)'$newHash'(?=@)' ~/.mgiteg)
+oldHash=$(grep -oP '(?<=^)'$newHash'(?=@)' $HASHSALT_PATH)
 if [ "$oldHash" = "" ]
 then
     newSalt=$(openssl rand -hex 8)
-    echo $newHash@$newSalt >> ~/.mgiteg
+    echo $newHash@$newSalt >> $HASHSALT_PATH
 else
-    thisLine=$(grep -oP '^'$oldHash'.*$'  ~/.mgiteg)
+    thisLine=$(grep -oP '^'$oldHash'.*$'  $HASHSALT_PATH)
     newSalt=$(echo $thisLine | grep -oP '(?<=@)[0-9a-fA-F]*(?=$)')
 fi
 #echo $originContent >> ~/.tgitlog

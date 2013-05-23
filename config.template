@@ -1,0 +1,5 @@
+[filter "openssl"]
+	smudge=~/.git_secure/<your-reponame>/smudge_filter_openssl
+	clean=~/.git_secure/<your-reponame>/clean_filter_openssl
+[diff "openssl"]
+      textconv=~/.git_secure/<your-reponame>/diff_filter_openssl
