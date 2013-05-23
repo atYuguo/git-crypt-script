@@ -1,5 +1,29 @@
-:: 24 or less hex characters
-set SALT_FIXED=<your-salt>
-set PASS_FIXED=<your-passphrase>
+#!/bin/bash
+if [ "$1" != "keylist" ]
+then
+    oldFilehash=$(grep -oP '(?<=^'$1'@)[0-9a-fA-F]*(?=@@)' keylist)
+    newFilehash=$(openssl dgst -sha1 $1)
+    newFilehash=$(echo $newFilehash | grep -oP '(?<=\)=\W)[0-9a-fA-F]*')
+    if [ "$oldFilehash" = "$newFilehash" ]
+    then
+	theLine=$(grep -P '^'$1'@[0-9a-fA-F]*@@[0-9a-fA-F]*@@@[0-9a-fA-F]*' keylist)
+	eKey=$(echo $theLine | grep -oP '(?<=@@)[0-9a-fA-F]*(?=@@@)')
+	eSalt=$(echo $theLine | grep -oP '(?<=@@@)[0-9a-fA-F]*')
+#	echo yes
+#	echo $eKey
+#	echo yes
+    else
+	eKey=$(openssl rand -hex 32)
+	eSalt=$(openssl rand -hex 8)
+	if [ "$oldFilehash" = "" ]
+	then
+	    echo $1@$newFilehash@@$eKey@@@$eSalt >>keylist
+	else
+    	    sed -i 's/^'"$1"'.*$/'"$1"'@'"$newFilehash"'@@'"$eKey"'@@@'"$eSalt"'/g' keylist
+	fi
+    fi
+ 
+#    echo $eKey
 
-openssl enc -hex -aes-256-ecb -S %SALT_FIXED% -k %PASS_FIXED%
+    openssl enc -aes-256-cbc -S $eSalt -k $eKey -in $1 -out test.txt
+fi

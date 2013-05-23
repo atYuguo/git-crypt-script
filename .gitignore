@@ -6,3 +6,5 @@
 sed*
 pcre-config
 *.rnd
+test
+test/*
