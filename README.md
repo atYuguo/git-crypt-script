@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 
 ##基本过程
-通过这个软件配置本地版本库后，当进行 `git add` 动作时， `git` 自动调用 `filter` 里的 `clean_filter_openssl` 将文件内容输出到 ‘clean_filter_openssl’ 脚本中。 `clean_filter_openssl` 脚本逐行读入这些输出，在行末添加 `\r` 然后加密连接起来的完整字符串。当然最后提交和 `push` 的都是加密文件。
+通过这个软件配置本地版本库后，当进行 `git add` 动作时， `git` 自动调用 `filter` 里的 `clean_filter_openssl` 将文件内容输出到 `clean_filter_openssl` 脚本中。 `clean_filter_openssl` 脚本逐行读入这些输出，在行末添加 `\r` 然后加密连接起来的完整字符串。当然最后提交和 `push` 的都是加密文件。
 
 执行 `checkout` 时， `git` 自动调用 `filter` 里的 `smudge_filter_openssl` 解密后，自动替换 `\r` 为 `\n` 得到明文。
 
