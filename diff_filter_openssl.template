@@ -1,4 +1,3 @@
 #!/bin/bash
 PASS_FIXED=<your-password>
-openssl enc -d -aes-256-cbc -k $PASS_FIXED -in "$1" 2>/dev/null && sed 's/\r/\n/g' || cat "$1"
-
+plainText=openssl enc -d -aes-256-cbc -k $PASS_FIXED -in "$1" 2> /dev/null && echo $plainTex | sed 's/\r/\n/g' || cat $1

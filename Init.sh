@@ -35,7 +35,8 @@ sed -i 's/<your-password>/'$theKey'/g' *
 sed -i 's/<your-reponame>/'$reponame'/g' *
 touch hashandsalt
 cat ./config >> $repoPath/.git/config
-cat ./.gitattributes >>$repoPath/.gitattributes
+cat ./gitattributes >>$repoPath/.gitattributes
+echo ".gitattributes" >>$repoPath/.gitignore
 echo ----------------------------------------
 echo               初始化完成。
 echo ----------------------------------------
