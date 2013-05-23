@@ -1,11 +1,4 @@
 #!/bin/bash
 PASS_FIXED=<your-password>
-function breaklines () {
-if [ $? -eq 0 ]
-then
-    sed 's/\r\([^\r]\)/\n\1/g' $1
-else
-    exit 1
-fi
-}
-openssl enc -d -aes-256-cbc -k $PASS_FIXED 2> /dev/null | breaklines || cat
+set -o pipefail
+openssl enc -d -aes-256-cbc -k $PASS_FIXED 2> /dev/null | sed 's/\r\([^\r]\)/\n\1/g' || cat
