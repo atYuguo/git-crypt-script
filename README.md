@@ -49,4 +49,4 @@ You should have received a copy of the GNU General Public License along with thi
 这个工具目前稳定性未知，请做好备份工作。
 
 
-[1]:gist.github.com/shadowhand/873637 "Transparent Git Encryption"
+[1]:https://gist.github.com/shadowhand/873637 "Transparent Git Encryption"
