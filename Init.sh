@@ -47,9 +47,11 @@ then
     done
     sed -i 's/<your-password>/'$theKey'/g' *
     sed -i 's/<your-reponame>/'$reponame'/g' *
-    if [ ! -f hashandsalt ]
+    useRepopath=$(echo $repoPath | sed 's/\//\\\//g')
+    sed -i 's/<your-repopath>/'$useRepopath'/g' *
+    if [ ! -f $repoPath/hashandsalt ]
     then
-	touch hashandsalt
+	touch $repoPath/hashandsalt
     fi
 else
     existFlag=1
