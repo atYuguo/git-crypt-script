@@ -2,19 +2,9 @@
 REPONAME=<your-reponame>
 PASS_FIXED=<your-password>
 HASHSALT_PATH=~/.git_secure/$REPONAME/hashandsalt
-breakline=$(echo -e '\r')
-firstlineFlag=true
-while read -r aLine
-do
-    if [ "$firstlineFlag" = "true" ]
-    then
-	originContent=$aLine
-	firstlineFlag=flase
-    else
-	originContent=$originContent$breakline$aLine
-    fi
-done
-newHash=$(echo $originContent | openssl dgst -sha1)
+TEMP_PATH=~/.git_secure/$REPONAME/temp
+~/.git_secure/writeTemp.o $TEMP_PATH
+newHash=$(openssl dgst -sha1 $TEMP_PATH)
 newHash=$(echo $newHash | grep -oP '(?<=\)=\W)[0-9a-fA-F]*')
 oldHash=$(grep -oP '(?<=^)'$newHash'(?=@)' $HASHSALT_PATH)
 if [ "$oldHash" = "" ]
@@ -26,4 +16,4 @@ else
     newSalt=$(echo $thisLine | grep -oP '(?<=@)[0-9a-fA-F]*(?=$)')
 fi
 #echo $originContent >> ~/.tgitlog
-echo $originContent | openssl enc -aes-256-cbc -S $newSalt -k $PASS_FIXED
+openssl enc -aes-256-cbc -S $newSalt -k $PASS_FIXED -in $TEMP_PATH

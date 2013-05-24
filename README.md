@@ -14,9 +14,11 @@ You should have received a copy of the GNU General Public License along with thi
 
 
 ##基本过程
-通过这个软件配置本地版本库后，当进行 `git add` 动作时， `git` 自动调用 `filter` 里的 `clean_filter_openssl` 将文件内容输出到 `clean_filter_openssl` 脚本中。 `clean_filter_openssl` 脚本逐行读入这些输出，在行末添加 `\r` 然后加密连接起来的完整字符串。当然最后提交和 `push` 的都是加密文件。
+通过这个软件配置本地版本库后，当进行 `git add` 动作时， `git` 自动调用 `filter` 里的 `clean_filter_openssl` 将文件内容输出到 `clean_filter_openssl` 脚本中。 `clean_filter_openssl` 调用 `writeTemp.o` 将标准输入写入
 
-执行 `checkout` 时， `git` 自动调用 `filter` 里的 `smudge_filter_openssl` 解密后，自动替换 `\r` 为 `\n` 得到明文。
+><pre><code>~/.git_secure/\<your-reponame\>/temp
+
+文件，然后将这个文件的加密结果作为标准输出。当然最后提交和 `push` 的都是加密文件。执行 `checkout` 时， `git` 自动调用 `filter` 里的 `smudge_filter_openssl` 解密。
 
 ##加密算法
 如果你读过[Transparent Git Encryption][1]，可能为上面提到的复杂过程感到困惑，实际情况还要复杂些。这一节来了解一下细节。
@@ -35,7 +37,6 @@ You should have received a copy of the GNU General Public License along with thi
 
 根据我在网上看到的资料，公开 `hashandsalt` 文件的内容似乎不影响安全性，但实际情况我并不清楚。
 
-这种做法带来一个问题： `git add` 时，文件内容以标准输入的形式传入 `clean_filter_openssl` 中，但我只知道如何一行一行的读入这些内容，所以没有办法读取“回车”，只能采用在连接两行时中间添加一个 `\r` ，然后再解密时替换成换行，有的时候这个操作会使文件发生改变(多出一些空行)， `git diff` 会给出差别，而且这样一来，不能操作二进制文件。如果谁有解决这个问题的好方法，麻烦告诉我:)
 
 ##使用方法
 初次加密，运行 `Init.sh` 按照提示输入版本库路径和你想使用的密码，就可以自动配置好，之后只需要像通常一样的使用 `git`，要注意对历史的加密。对于克隆的加密版本库同样运行 `Init.sh` 并输入路径，脚本会根据已经有的信息自动配置好。

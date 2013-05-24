@@ -1,4 +1,3 @@
 #!/bin/bash
 PASS_FIXED=<your-password>
-set -o pipefail
-openssl enc -d -aes-256-cbc -k $PASS_FIXED -in "$1" 2> /dev/null | sed 's/\r\([^\r]\)/\n\1/g' || cat "$1"
+openssl enc -d -aes-256-cbc -k $PASS_FIXED -in "$1" 2> /dev/null || cat "$1"

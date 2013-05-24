@@ -7,6 +7,10 @@ if [ ! -d ~/.git_secure ]
 then
     mkdir ~/.git_secure
 fi
+if [ ! -f ~/.git_secure/writeTemp.o ]
+then
+    gcc writeTemp.c -o ~/.git_secure/writeTemp.o
+fi
 echo
 echo ----------------------------------------
 echo           请输入本地库路径：
