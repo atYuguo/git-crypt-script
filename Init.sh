@@ -54,7 +54,7 @@ fi
 cat ./config >> $repoPath/.git/config
 cat ./gitattributes >>$repoPath/.gitattributes
 echo ".gitattributes" >>$repoPath/.gitignore
-if [ existFlag -eq 1 ]
+if [ $existFlag -eq 1 ]
 then
     cd $repoPath
     git reset --hard HEAD
