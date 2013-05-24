@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 但是根据我在网上查到的资料 `aes-256-ecb` 本身就不够安全，为了达到应有的可靠性，只建议加密小于一个区块长度的明文，并且每一个密钥只建议加密相同的区块一次。而且作者还采用了固定的“盐”，就更加不安全。
 
-为了能同时兼顾安全性和 `git` 的功能，我采用的是 `aes-256-cbc` 算法以及固定密钥和随机“盐”，不过，我将每个文件的 `sha1` 码和“盐”以下列形式存储在 `~/.git_secure/<your-reponame>/hashandsalt` 文件中：
+为了能同时兼顾安全性和 `git` 的功能，我采用的是 `aes-256-cbc` 算法以及固定密钥和随机“盐”，不过，我将每个文件的 `sha1` 码和“盐”以下列形式存储在 `<your-repopath>/hashandsalt` 文件中：
 
 ><pre><code>sha1@salt</code></pre>
 
@@ -41,6 +41,7 @@ You should have received a copy of the GNU General Public License along with thi
 ##使用方法
 初次加密，运行 `Init.sh` 按照提示输入版本库路径和你想使用的密码，就可以自动配置好，之后只需要像通常一样的使用 `git`，要注意对历史的加密。对于克隆的加密版本库同样运行 `Init.sh` 并输入路径，脚本会根据已经有的信息自动配置好。
 
+`hashandsalt` 文件现在已经放入你的版本库中，这样每次在新的本地源工作的时候就不需要为单独带这个文件操心了。不过，当你修改版本库中的文件时并 `git add` 时， `hashandsalt` 也会改变，结果就是无论 `add` 多少遍，`git status` 总是提示 `hashandsalt `有未加入暂存区的修改，你只需忽略这个提示就好了。当你要执行 `pull` 时， `hashandsalt` 可能会阻止合并，如果发生这种情况，请先 `rm hashandsalt` 再 `pull` 。
 ##注意事项
 你的密码明文的保存在
 
