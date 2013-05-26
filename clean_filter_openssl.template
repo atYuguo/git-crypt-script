@@ -4,12 +4,11 @@ PASS_FIXED=<your-password>
 HASHSALT_PATH=<your-repopath>/hashandsalt
 TEMP_PATH=~/.git_secure/$REPONAME/temp
 ~/.git_secure/writeTemp.o $TEMP_PATH
-newHash=$(openssl dgst -sha1 $TEMP_PATH)
-newHash=$(echo $newHash | grep -oP '(?<=\)=\W)[0-9a-fA-F]*')
+newHash=$(~/.git_secure/gitcryptDigst.o $TEMP_PATH)
 oldHash=$(grep -oP '(?<=^)'$newHash'(?=@)' $HASHSALT_PATH)
 if [ "$oldHash" = "" ]
 then
-    newSalt=$(openssl rand -hex 8)
+    newSalt=$(~/.git_secure/gitcryptSalt.o)
     echo $newHash@$newSalt >> $HASHSALT_PATH
 else
     thisLine=$(grep -oP '^'$oldHash'.*$'  $HASHSALT_PATH)
