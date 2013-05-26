@@ -60,6 +60,7 @@ then
     if [ ! -f $repoPath/hashandsalt ]
     then
 	touch $repoPath/hashandsalt
+	echo "*%*%-This is the hashAndsalt file.-%*%*" >> $repoPath/hashandsalt
     fi
 else
     existFlag=1
