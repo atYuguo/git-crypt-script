@@ -46,7 +46,7 @@ then
     echo            请输入密码：
     echo ----------------------------------------
     read theKey
-    cp *.template ~/.git_secure/$reponame
+    cp $mainpath/*.template ~/.git_secure/$reponame
     cd ~/.git_secure/$reponame
     for template in $(ls *.template)
     do
