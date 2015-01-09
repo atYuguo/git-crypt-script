@@ -1,24 +1,16 @@
 #!/bin/bash
 REPONAME=<your-reponame>
 PASS_FIXED=<your-password>
-HASHSALT_PATH=<your-repopath>/hashandsalt
+HASHSALT_PATH=~/.git_secure/$REPONAME/hashandsalt
 TEMP_PATH=~/.git_secure/$REPONAME/temp
 ~/.git_secure/writeTemp.o $TEMP_PATH
-echo "$(head -1 $TEMP_PATH)" | grep '*%*%-This is the hashAndsalt file.-%*%*' 1> /dev/null 2> /dev/null
-if [ $? -eq 0 ]
+newHash=$(~/.git_secure/gitcryptDigst.o $TEMP_PATH)
+oldHash=$(grep -oP '(?<=^)'$newHash'(?=@)' $HASHSALT_PATH)
+if ! [ "$oldHash" = "" ]
 then
-    cat $TEMP_PATH
+    thisLine=$(grep -oP '^'$oldHash'.*$'  $HASHSALT_PATH)
+    originalSalt=$(echo $thisLine | grep -oP '(?<=@)[0-9a-fA-F]*(?=$)')
+    openssl enc -aes-256-cbc -S $originalSalt -k $PASS_FIXED -in $TEMP_PATH
 else
-    newHash=$(~/.git_secure/gitcryptDigst.o $TEMP_PATH)
-    oldHash=$(grep -oP '(?<=^)'$newHash'(?=@)' $HASHSALT_PATH)
-    if [ "$oldHash" = "" ]
-    then
-    newSalt=$(~/.git_secure/gitcryptSalt.o)
-    echo $newHash@$newSalt >> $HASHSALT_PATH
-    else
-	thisLine=$(grep -oP '^'$oldHash'.*$'  $HASHSALT_PATH)
-	newSalt=$(echo $thisLine | grep -oP '(?<=@)[0-9a-fA-F]*(?=$)')
-    fi
-    openssl enc -aes-256-cbc -S $newSalt -k $PASS_FIXED -in $TEMP_PATH
-    rm $TEMP_PATH
+    openssl enc -aes-256-cbc -k $PASS_FIXED -in $TEMP_PATH
 fi

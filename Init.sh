@@ -50,17 +50,16 @@ then
     cd ~/.git_secure/$reponame
     for template in $(ls *.template)
     do
-	chmod 777 $template
+	chmod 750 $template
 	mv $template $(echo $template | grep -oP '.*(?=.template)')
     done
     sed -i 's/<your-password>/'$theKey'/g' *
     sed -i 's/<your-reponame>/'$reponame'/g' *
     useRepopath=$(echo $repoPath | sed 's/\//\\\//g')
     sed -i 's/<your-repopath>/'$useRepopath'/g' *
-    if [ ! -f $repoPath/hashandsalt ]
+    if [ ! -f ~/.git_secure/$reponame/hashandsalt ]
     then
-	touch $repoPath/hashandsalt
-	echo "*%*%-This is the hashAndsalt file.-%*%*" >> $repoPath/hashandsalt
+	touch ~/.git_secure/$reponame/hashandsalt
     fi
 else
     existFlag=1
