@@ -15,10 +15,6 @@ if [ ! -f ~/.git_secure/gitcryptDigst.o ]
 then
     gcc gitcryptDigst.c -lssl -lcrypto -o ~/.git_secure/gitcryptDigst.o
 fi
-if [ ! -f ~/.git_secure/gitcryptSalt.o ]
-then
-    gcc gitcryptSalt.c -lssl -lcrypto -o ~/.git_secure/gitcryptSalt.o
-fi
 echo
 echo ----------------------------------------
 echo           请输入本地库路径：

@@ -10,7 +10,7 @@ if ! [ "$oldHash" = "" ]
 then
     thisLine=$(grep -oP '^'$oldHash'.*$'  $HASHSALT_PATH)
     originalSalt=$(echo $thisLine | grep -oP '(?<=@)[0-9a-fA-F]*(?=$)')
-    openssl enc -aes-256-cbc -S $originalSalt -k $PASS_FIXED -in $TEMP_PATH
+    openssl enc -aes-256-cbc -S $originalSalt -k $PASS_FIXED -base64 -in $TEMP_PATH
 else
-    openssl enc -aes-256-cbc -k $PASS_FIXED -in $TEMP_PATH
+    openssl enc -aes-256-cbc -k $PASS_FIXED -base64 -in $TEMP_PATH
 fi
