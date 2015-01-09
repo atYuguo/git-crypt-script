@@ -12,6 +12,20 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+##依赖
+
+gcc
+
+openssl
+
+openssl-devel
+
+xxd
+
+dd
+
+base64
+
 
 ##基本过程
 通过这个软件配置本地版本库后，当进行 `git add` 动作时， `git` 自动调用 `filter` 里的 `clean_filter_openssl` 将文件内容输出到 `clean_filter_openssl` 脚本中。 `clean_filter_openssl` 调用 `writeTemp.o` 将标准输入写入
@@ -21,27 +35,33 @@ You should have received a copy of the GNU General Public License along with thi
 文件，然后将这个文件的加密结果作为标准输出。当然最后提交和 `push` 的都是加密文件。执行 `checkout` 时， `git` 自动调用 `filter` 里的 `smudge_filter_openssl` 解密。
 
 ##加密算法
-如果你读过[Transparent Git Encryption][1]，可能为上面提到的复杂过程感到困惑，实际情况还要复杂些。这一节来了解一下细节。
-
-在[Transparent Git Encryption][1]里，作者使用了 `aes-256-ecb` 算法，并且使用了固定的密钥和“盐”（salt）。这是为了保障每个文件每次加密的结果都相同，因为如果采用其他算法以及随机“盐”，那么即便是相同的文件每次加密的结果也不相同，虽然不影响 `git diff` 的结果，但是却不能正常使用 `git status`。按照作者的说法，如果采用非确定的加密方法，即使什么都不改变， `git status` 也会给出文件修改的结果。
+在 [Transparent Git Encryption][1] 里，作者使用了 `aes-256-ecb` 算法，并且使用了固定的密钥和“盐”（salt）。这是为了保障每个文件每次加密的结果都相同，因为如果采用其他算法以及随机“盐”，那么即便是相同的文件每次加密的结果也不相同，虽然不影响 `git diff` 的结果，但是却不能正常使用 `git status`。按照作者的说法，如果采用非确定的加密方法，即使什么都不改变， `git status` 也会给出文件修改的结果。
 
 但是根据我在网上查到的资料 `aes-256-ecb` 本身就不够安全，为了达到应有的可靠性，只建议加密小于一个区块长度的明文，并且每一个密钥只建议加密相同的区块一次。而且作者还采用了固定的“盐”，就更加不安全。
 
-为了能同时兼顾安全性和 `git` 的功能，我采用的是 `aes-256-cbc` 算法以及固定密钥和随机“盐”，不过，我将每个文件的 `sha1` 码和“盐”以下列形式存储在 `<your-repopath>/hashandsalt` 文件中：
+为了能同时兼顾安全性和 `git` 的功能，我采用的是 `aes-256-cbc` 算法、固定密钥以及 `openssl` 按照默认方法生成的盐。**不同于这个脚本的旧版本，现在这个脚本完全使用 `openssl aes-256-cbc` 加密的默认设置，不需要独立的生成随机盐，也不需要在代码库中引入 `hashandsalt` 文件，所以安全性和便利性都完全得到了保障！**
 
-><pre><code>sha1@salt</code></pre>
+这是因为注意到了 `openssl aes-256-cbc` 加密时，所用的盐保存在加密后文件的前16位的后8位上。所以现在的执行过程是：
 
-每次 `git add` 时，先判断文件的 `sha1` 有没有改变，如果没有改变，就采用过去的“盐”，加上固定密钥，加密的结果和原来是一样的；如果文件改变了，就产生新的随机“盐”用于加密，并将新的 `sha1@salt` 存储在 `hashandsalt` 文件中。
+1. 解密时保存原来的 salt 和解密后明文的 hash 到 `~/.git_secure/\<your-reponame\>/hashandsalt` 文件中，这个文件每次会自动生成，无需保存或携带。
 
-这样，只要有 `hashandsalt` 文件，就不存在[Transparent Git Encryption][1]里所说的采用非确定加密算法的问题。如果没有 `hashandsalt` 文件，只要知道密钥也可以解密，但当两个不同的本地库和远程库同步时会存在问题。
+2. 加密时根据 `hashandsalt` 文件判断明文的 hash 有没有改变。如果 hash 没有改变，就提取过去的 salt, 然后用下述命令加密：
 
-根据我在网上看到的资料，公开 `hashandsalt` 文件的内容似乎不影响安全性，但实际情况我并不清楚。
+```bash
+openssl enc -aes-256-cbc -S $originalSalt -k $PASS_FIXED -base64 -in $TEMP_PATH
+```
 
+如果 hash 发生了改变，则用下面的命令
+
+```bash
+openssl enc -aes-256-cbc -k $PASS_FIXED -base64 -in $TEMP_PATH
+```
+
+这样一来，文件没有改变的情况下，加密的结果也不会改变，避免了 [Transparent Git Encryption][1] 里所说的采用非确定加密算法的问题。同时没有使用固定的盐，而且采用的加密算法也足够强健，安全得到了保障。
 
 ##使用方法
 初次加密，运行 `Init.sh` 按照提示输入版本库路径和你想使用的密码，就可以自动配置好，之后只需要像通常一样的使用 `git`，要注意对历史的加密。对于克隆的加密版本库同样运行 `Init.sh` 并输入路径，脚本会根据已经有的信息自动配置好。
 
-`hashandsalt` 文件现在已经放入你的版本库中，这样每次在新的本地源工作的时候就不需要为单独带这个文件操心了。不过，目前排除了对 `hashandslat` 文件的加密，这样用起来方便，但公开文件的原始 `sha1` 和 `salt` 不知道是否影响安全性。
 ##注意事项
 你的密码明文的保存在
 
@@ -50,6 +70,10 @@ You should have received a copy of the GNU General Public License along with thi
 里的三个 `*_filter_openssl` 文件里，要注意保护这些文件。
 
 这个工具目前稳定性未知，请做好备份工作。
+
+##有待改进
+
+因为 `writeTemp.c` 在处理二进制文件是总是出问题，所以目前加密采用 `base64` 编码，但估计若能直接操作二进制文件会改善效率。如果哪位大神有兴趣，还望不吝赐教。
 
 
 [1]:https://gist.github.com/shadowhand/873637 "Transparent Git Encryption"
