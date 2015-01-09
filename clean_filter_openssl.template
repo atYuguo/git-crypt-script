@@ -6,7 +6,7 @@ TEMP_PATH=~/.git_secure/$REPONAME/temp
 ~/.git_secure/writeTemp.o $TEMP_PATH
 newHash=$(~/.git_secure/gitcryptDigst.o $TEMP_PATH)
 oldHash=$(grep -oP '(?<=^)'$newHash'(?=@)' $HASHSALT_PATH)
-if ! [ "$oldHash" = "" ]
+if [ ! "$oldHash" = "" ]
 then
     thisLine=$(grep -oP '^'$oldHash'.*$'  $HASHSALT_PATH)
     originalSalt=$(echo $thisLine | grep -oP '(?<=@)[0-9a-fA-F]*(?=$)')

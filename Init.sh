@@ -24,7 +24,7 @@ cd $repoPath 2>/dev/null
 if [ $? -eq 1 ]
 then
     echo 版本库不存在，将创建新版本库。。。
-    mkdir $repoPath
+    mkdir -p $repoPath
     cd $repoPath
     git init
 fi
@@ -67,7 +67,7 @@ echo ".gitattributes" >>$repoPath/.gitignore
 if [ $existFlag -eq 1 ]
 then
     cd $repoPath
-    git reset --hard HEAD
+    git reset --hard
 fi
 echo ----------------------------------------
 echo               初始化完成。
