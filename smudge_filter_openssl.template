@@ -7,7 +7,7 @@ PASS_FIXED=<your-password>
 ~/.git_secure/writeTemp.o $TEMPP_PATH
 base64 -d $TEMPP_PATH > $TEMP_PATH
 rm $TEMPP_PATH
-openssl enc -d -aes-256-cbc -k $PASS_FIXED -in $TEMP_PATH -out $TEMPP_PATH 2> /dev/null
+openssl enc -d -aes-256-cbc -k $PASS_FIXED -base64 -in $TEMP_PATH -out $TEMPP_PATH 2> /dev/null
 SALT_TEMP=$(dd if=$TEMP_PATH bs=8 count=1 skip=1 2> /dev/null| xxd -p)
 HASH_TEMP=$(~/.git_secure/gitcryptDigst.o $TEMPP_PATH)
 echo $HASH_TEMP@$SALT_TEMP >> $HASHSALT_PATH
