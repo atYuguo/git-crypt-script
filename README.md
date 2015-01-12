@@ -69,7 +69,10 @@ git reset --hard
 ```
 
 ## 注意事项
-你的密码明文的保存在
+
+1. 如果是 clone 的加密库，请在 clone 后立即执行 `Init.sh` 设置版本库，并 `git reset --hard` 解密。由于未知的原因，如果在版本库未解密的情况下对版本库进行 git 相关操作（比如 `git status`），虽然不会对文件造成影响，但却会导致解密设置失败，无法用 `git reset --hard` 解密。如果哪位清楚是什么原因，请不吝赐教。
+
+2. 你的密码明文的保存在
 
 ```bash
 ~/.git_secure/<your-reponame>/
@@ -77,7 +80,7 @@ git reset --hard
 
 里的三个 `*_filter_openssl` 文件里，要注意保护这些文件。
 
-这个工具目前稳定性未知，请做好备份工作。
+3. 这个工具目前稳定性未知，请做好备份工作。
 
 
 [1]:https://gist.github.com/shadowhand/873637 "Transparent Git Encryption"
