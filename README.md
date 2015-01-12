@@ -24,8 +24,6 @@ xxd
 
 dd
 
-base64
-
 
 ## 基本过程
 通过这个软件配置本地版本库后，当进行 `git add` 动作时， `git` 自动调用 `filter` 里的 `clean_filter_openssl` 将文件内容输出到 `clean_filter_openssl` 脚本中。 `clean_filter_openssl` 调用 `writeTemp.o` 将标准输入写入
@@ -50,13 +48,13 @@ base64
 2. 加密时根据 `hashandsalt` 文件判断明文的 hash 有没有改变。如果 hash 没有改变，就提取过去的 salt, 然后用下述命令加密：
 
 ```bash
-openssl enc -aes-256-cbc -S $originalSalt -k $PASS_FIXED -base64 -in $TEMP_PATH
+openssl enc -aes-256-cbc -S $originalSalt -k $PASS_FIXED -in $TEMP_PATH
 ```
 
 如果 hash 发生了改变，则用下面的命令
 
 ```bash
-openssl enc -aes-256-cbc -k $PASS_FIXED -base64 -in $TEMP_PATH
+openssl enc -aes-256-cbc -k $PASS_FIXED -in $TEMP_PATH
 ```
 
 这样一来，文件没有改变的情况下，加密的结果也不会改变，避免了 [Transparent Git Encryption][1] 里所说的采用非确定加密算法的问题。同时没有使用固定的盐，而且采用的加密算法也足够强健，安全得到了保障。
@@ -80,10 +78,6 @@ git reset --hard
 里的三个 `*_filter_openssl` 文件里，要注意保护这些文件。
 
 这个工具目前稳定性未知，请做好备份工作。
-
-## 有待改进
-
-因为 `writeTemp.c` 在处理二进制文件是总是出问题，所以目前加密采用 `base64` 编码，但估计若能直接操作二进制文件会改善效率。如果哪位大神有兴趣，还望不吝赐教。
 
 
 [1]:https://gist.github.com/shadowhand/873637 "Transparent Git Encryption"
