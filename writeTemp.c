@@ -9,9 +9,14 @@ int main (int argc,char *argv[])
     }
     else{
       char chInstream[1];
-      while (!feof(stdin)){
+      while (1){
 	fread(chInstream,sizeof(char),1,stdin);
-	fwrite(chInstream,sizeof(char),1,tempFile);
+	if (!feof(stdin)){
+	  fwrite(chInstream,sizeof(char),1,tempFile);
+	}
+	else{
+	  break;
+	}
       }
     }
     fclose(tempFile);
