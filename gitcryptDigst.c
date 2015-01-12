@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <openssl/evp.h>
-#define READLENGTH 128
+#define READLENGTH 256
 main (int argc, char *argv[])
 {
   EVP_MD_CTX *mdctx;
-  const EVP_MD *md=EVP_sha1();
+  const EVP_MD *md=EVP_sha256();
   char mess[READLENGTH+1];
   unsigned char md_value[EVP_MAX_MD_SIZE];
   int md_len,i,nowLength;

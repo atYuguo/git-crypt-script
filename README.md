@@ -45,7 +45,7 @@ base64
 
 这是因为注意到了 `openssl aes-256-cbc` 加密时，所用的盐保存在加密后文件的前16个字节的后8个字节上。所以现在的执行过程是：
 
-1. 解密时保存原来的 salt 和解密后明文的 hash 到 `~/.git_secure/<your-reponame>/hashandsalt` 文件中，这个文件每次会自动生成，无需专门保存或随版本库携带。
+1. 解密时保存原来的 salt 和解密后明文的 hash(sha256) 到 `~/.git_secure/<your-reponame>/hashandsalt` 文件中，这个文件每次会自动生成，无需专门保存或随版本库携带。
 
 2. 加密时根据 `hashandsalt` 文件判断明文的 hash 有没有改变。如果 hash 没有改变，就提取过去的 salt, 然后用下述命令加密：
 
