@@ -1,3 +1,5 @@
+
+
 # Git加密脚本
 这个软件用于实现对远程版本库的完整加密。主要方法来源于：
 
@@ -13,6 +15,8 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## 依赖
+
+git
 
 gcc
 
